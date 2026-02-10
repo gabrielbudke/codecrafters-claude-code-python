@@ -24,7 +24,7 @@ def main():
         tools=[{
             "type": "function",
             "function": {
-                "name": "Read",
+                "name": "ReadFile",
                 "description": "Read and return the contents of a file",
                 "parameters": {
                     "type": "object",
@@ -42,6 +42,19 @@ def main():
 
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
+
+    for choice in chat.choices:
+        if choice.message.tool_calls and len(choice.message.tool_calls) > 0:
+            for tool_call in choice.message.tool_calls:
+                if tool_call.type == "function" and tool_call.function_call.name == "ReadFile":
+                    file_path = tool_call.function_call.arguments.get("file_path")
+                    if not file_path:
+                        raise RuntimeError("no file_path argument in tool call")
+                    with open(file_path, "r") as f:
+                        file_contents = f.read()
+                    print(f"{file_contents}")
+                   
+
 
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
