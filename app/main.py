@@ -1,8 +1,10 @@
 import argparse
+import json
 import os
 import sys
 
 from openai import OpenAI
+
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -47,7 +49,8 @@ def main():
         if choice.message.tool_calls and len(choice.message.tool_calls) > 0:
             for tool_call in choice.message.tool_calls:             
                 if tool_call.type == "function" and tool_call.function.name == "ReadFile":
-                    file_path = tool_call.function.arguments.get("file_path")
+                    arguments = json.loads(tool_call.function.arguments)
+                    file_path = arguments.get("file_path")
                     if not file_path:
                         raise RuntimeError("no file_path argument in tool call")
                     with open(file_path, "r") as f:
