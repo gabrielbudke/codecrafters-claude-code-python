@@ -45,10 +45,9 @@ def main():
 
     for choice in chat.choices:
         if choice.message.tool_calls and len(choice.message.tool_calls) > 0:
-            print(f"{choice}")
-            for tool_call in choice.message.tool_calls:
-                if tool_call.type == "function" and tool_call.function_call.name == "ReadFile":
-                    file_path = tool_call.function_call.arguments.get("file_path")
+            for tool_call in choice.message.tool_calls:             
+                if tool_call.type == "function" and tool_call.function.name == "ReadFile":
+                    file_path = tool_call.function.arguments.get("file_path")
                     if not file_path:
                         raise RuntimeError("no file_path argument in tool call")
                     with open(file_path, "r") as f:
