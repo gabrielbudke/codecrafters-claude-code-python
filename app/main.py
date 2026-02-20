@@ -63,9 +63,7 @@ def main():
                             "content": file_contents,
                     })
         else:
-            has_no_tool_calls = True
-
-    print(f"TESTE: {messages.pop()}")
+            has_no_tool_calls = True    
 
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
