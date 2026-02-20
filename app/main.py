@@ -26,23 +26,46 @@ def main():
         chat = client.chat.completions.create(
             model="anthropic/claude-haiku-4.5",
             messages=messages,
-            tools=[{
-                "type": "function",
-                "function": {
-                    "name": "ReadFile",
-                    "description": "Read and return the contents of a file",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "file_path": {
-                                "type": "string",
-                                "description": "The path to the file to read"
+            tools=[
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "ReadFile",
+                        "description": "Read and return the contents of a file",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "file_path": {
+                                    "type": "string",
+                                    "description": "The path to the file to read"
+                                }
+                            },
+                            "required": ["file_path"]
+                        }
+                    }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "WriteFile",
+                        "description": "Write content to a file",
+                        "parameters": {
+                            "type": "object",
+                            "required": ["file_path", "content"],
+                            "properties": {
+                                "file_path": {
+                                    "type": "string",
+                                    "description": "The path of the file to write to"
+                                },
+                                "content": {
+                                    "type": "string",
+                                    "description": "The content to write to the file"
+                                }
                             }
-                        },
-                        "required": ["file_path"]
+                        }
                     }
                 }
-            }]
+            ]
         )
 
         if not chat.choices or len(chat.choices) == 0:
@@ -62,6 +85,12 @@ def main():
                             "tool_call_id": tool_call.id,
                             "content": file_contents,
                         })
+                if tool_call.function.name == "WriteFile":
+                    arguments = json.loads(tool_call.function.arguments)
+                    file_path = arguments.get("file_path")
+                    content = arguments.get("content")
+                    with open(file_path, "w") as f:
+                        f.write(content)                                     
         else:
             has_no_tool_calls = True    
 
