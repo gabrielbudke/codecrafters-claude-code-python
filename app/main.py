@@ -116,15 +116,16 @@ def main():
                         })         
                 if tool_call.function.name == "Bash":
                     arguments = json.loads(tool_call.function.arguments)
-                    command = arguments.get("command")
-                    result = subprocess.run(command, capture_output=True, text=True)
+                    command = arguments.get("command").split()
+                    result = subprocess.run(command, capture_output=True, text=True)                    
                     if  result.returncode != 0:
                         raise RuntimeError(result.stderr)
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": result.stdout
-                    })
+                    else
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": result.stdout
+                        })
         else:
             has_no_tool_calls = True    
 
