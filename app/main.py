@@ -18,14 +18,14 @@ def main():
     if not API_KEY:
         raise RuntimeError("OPENROUTER_API_KEY is not set")
 
-    message = [{"role": "user", "content": args.p}]
+    messages = [{"role": "user", "content": args.p}]
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
     has_no_tool_calls = False
     while not has_no_tool_calls:
         chat = client.chat.completions.create(
             model="anthropic/claude-haiku-4.5",
-            messages=message,
+            messages=messages,
             tools=[{
                 "type": "function",
                 "function": {
@@ -50,14 +50,14 @@ def main():
         
 
         if chat.choices[0].message.tool_calls:            
-            message.append(chat.choices[0].message)
+            messages.append(chat.choices[0].message)
             for tool_call in chat.choices[0].message.tool_calls:
                 if tool_call.function.name == "ReadFile":
                     arguments = json.loads(tool_call.function.arguments)
                     file_path = arguments.get("file_path")
                     with open(file_path, "r") as f:
                         file_contents = f.read()
-                        message.append({
+                        messages.append({
                             "role": "tool",
                             "tool_call_id": tool_call.id,
                             "content": file_contents,
@@ -65,7 +65,7 @@ def main():
         else:
             has_no_tool_calls = True
 
-    print(message.pop().content)
+    print(f"TESTE: {messages.pop()}")
 
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
