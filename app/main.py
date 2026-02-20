@@ -120,7 +120,7 @@ def main():
                     result = subprocess.run(command, capture_output=True, text=True)                    
                     if  result.returncode != 0:
                         raise RuntimeError(result.stderr)
-                    else
+                    else:
                         messages.append({
                             "role": "tool",
                             "tool_call_id": tool_call.id,
