@@ -14,50 +14,58 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("-p", required=True)
     args = p.parse_args()
-
+        
     if not API_KEY:
         raise RuntimeError("OPENROUTER_API_KEY is not set")
 
+    message = [{"role": "user", "content": args.p}]
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
-    chat = client.chat.completions.create(
-        model="anthropic/claude-haiku-4.5",
-        messages=[{"role": "user", "content": args.p}],
-        tools=[{
-            "type": "function",
-            "function": {
-                "name": "ReadFile",
-                "description": "Read and return the contents of a file",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "file_path": {
-                            "type": "string",
-                            "description": "The path to the file to read"
-                        }
-                    },
-                    "required": ["file_path"]
+    has_no_tool_calls = False
+    while not has_no_tool_calls:
+        chat = client.chat.completions.create(
+            model="anthropic/claude-haiku-4.5",
+            messages=message,
+            tools=[{
+                "type": "function",
+                "function": {
+                    "name": "ReadFile",
+                    "description": "Read and return the contents of a file",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "file_path": {
+                                "type": "string",
+                                "description": "The path to the file to read"
+                            }
+                        },
+                        "required": ["file_path"]
+                    }
                 }
-            }
-        }]
-    )
+            }]
+        )
 
-    if not chat.choices or len(chat.choices) == 0:
-        raise RuntimeError("no choices in response")
+        if not chat.choices or len(chat.choices) == 0:
+            raise RuntimeError("no choices in response")
+        
 
-    for choice in chat.choices:
-        if choice.message.tool_calls and len(choice.message.tool_calls) > 0:
-            for tool_call in choice.message.tool_calls:             
-                if tool_call.type == "function" and tool_call.function.name == "ReadFile":
+        if chat.choices[0].message.tool_calls:            
+            message.append(chat.choices[0].message)
+            for tool_call in chat.choices[0].message.tool_calls:
+                if tool_call.function.name == "ReadFile":
                     arguments = json.loads(tool_call.function.arguments)
                     file_path = arguments.get("file_path")
-                    if not file_path:
-                        raise RuntimeError("no file_path argument in tool call")
                     with open(file_path, "r") as f:
                         file_contents = f.read()
-                    print(f"{file_contents}")
-                   
+                        message.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": file_contents,
+                    })
+        else:
+            has_no_tool_calls = True
 
+    print(message.pop().content)
 
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
