@@ -6,6 +6,12 @@ import sys
 
 from openai import OpenAI
 
+from tools.tools import (
+    read_file_schema, 
+    write_file_schema, 
+    bash_schema
+)
+
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -28,11 +34,28 @@ def main():
             model="anthropic/claude-haiku-4.5",
             messages=messages,
             tools=[
-                {
-                    "type": "function",
-                    "function": {
-                        "name": "ReadFile",
-                        "description": "Read and return the contents of a file",
+                read_file_schema,
+                write_file_schema,
+                bash_schema
+            ]
+        )
+
+        if not chat.choices or len(chat.choices) == 0:
+            raise RuntimeError("no choices in response")
+        
+
+        if chat.choices[0].message.tool_calls:            
+            messages.append(chat.choices[0].message)
+            for tool_call in chat.choices[0].message.tool_calls:
+                if tool_call.function.name == "ReadFile":
+                    arguments = json.loads(tool_call.function.arguments)
+                    file_path = arguments.get("file_path")
+                    with open(file_path, "r") as f:
+                        file_contents = f.read()
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": file_contents,
                         "parameters": {
                             "type": "object",
                             "properties": {
