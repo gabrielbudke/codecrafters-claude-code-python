@@ -6,7 +6,7 @@ import sys
 
 from openai import OpenAI
 
-from tools import (
+from tools.tools import (
     read_file_schema, 
     write_file_schema, 
     bash_schema
