@@ -7,8 +7,8 @@ def load_schema(schema_path: str) -> dict:
     return schema
 
 
-read_file_schema = load_schema("tools/schema/read_file.json")
-write_file_schema = load_schema("tools/schema/write_file.json")
-bash_schema = load_schema("tools/schema/bash.json")
+read_file_schema = load_schema("app/schema/read_file.json")
+write_file_schema = load_schema("app/schema/write_file.json")
+bash_schema = load_schema("app/schema/bash.json")
 
 print(write_file_schema)
