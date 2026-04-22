@@ -2,8 +2,7 @@ import json
 
 def load_schema(schema_path: str) -> dict:
     with open(schema_path, "r") as file:
-        schema = json.load(file)      
-        print(f"> Loaded schema from {schema_path}: {schema}")  
+        schema = json.load(file)              
     return schema
 
 
