@@ -1,10 +1,11 @@
+import os
 import json
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
 
 def load_schema(schema_path: str) -> dict:
-    with open(schema_path, "r") as file:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.join(base_dir, schema_path)
+    print(f"Loading schema from {full_path}")
+    with open(full_path, "r") as file:
         schema = json.load(file)              
     return schema
 
