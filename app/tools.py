@@ -12,5 +12,3 @@ def load_schema(schema_path: str) -> dict:
 read_file_schema = load_schema(BASE_DIR / "schema" / "read_file.json")
 write_file_schema = load_schema(BASE_DIR / "schema" / "write_file.json")
 bash_schema = load_schema(BASE_DIR / "schema" / "bash.json")
-
-print(read_file_schema)
