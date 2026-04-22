@@ -6,8 +6,6 @@ import sys
 
 from openai import OpenAI
 
-from app.tools import (read_file_schema, write_file_schema, bash_schema)
-
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
@@ -68,7 +66,23 @@ def main():
                         }
                     }
                 },
-                bash_schema
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "Bash",
+                        "description": "Execute a shell command",
+                        "parameters": {
+                            "type": "object",
+                            "required": ["command"],
+                            "properties": {
+                                "command": {
+                                    "type": "string",
+                                    "description": "The command to execute"
+                                }
+                            }
+                        }
+                    }
+                }
             ]
         )
 

@@ -10,4 +10,4 @@ read_file_schema = load_schema("app/schema/read_file.json")
 write_file_schema = load_schema("app/schema/write_file.json")
 bash_schema = load_schema("app/schema/bash.json")
 
-print(write_file_schema)
+print(read_file_schema)
