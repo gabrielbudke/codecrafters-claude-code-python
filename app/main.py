@@ -17,6 +17,7 @@ dotenv.load_dotenv()
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL")
+AI_MODEL = os.getenv("OPENROUTER_AI_MODEL", "anthropic/claude-haiku-4.5")
 
 
 def main():
@@ -34,7 +35,7 @@ def main():
     while not has_no_tool_calls:
         chat = client.chat.completions.create(
             # model="anthropic/claude-haiku-4.5",
-            model="z-ai/glm-4.5-air:free",
+            model=AI_MODEL,
             messages=messages,
             tools=[
                 read_file_schema,
