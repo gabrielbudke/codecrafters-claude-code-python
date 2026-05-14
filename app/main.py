@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+import dotenv
 
 from openai import OpenAI
 
@@ -12,8 +13,10 @@ from app.tools import (
     bash_schema
 )
 
+dotenv.load_dotenv()
+
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
+BASE_URL = os.getenv("OPENROUTER_BASE_URL")
 
 
 def main():
@@ -30,7 +33,8 @@ def main():
     has_no_tool_calls = False
     while not has_no_tool_calls:
         chat = client.chat.completions.create(
-            model="anthropic/claude-haiku-4.5",
+            # model="anthropic/claude-haiku-4.5",
+            model="z-ai/glm-4.5-air:free",
             messages=messages,
             tools=[
                 read_file_schema,
