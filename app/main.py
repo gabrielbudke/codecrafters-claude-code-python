@@ -34,7 +34,6 @@ def main():
     has_no_tool_calls = False
     while not has_no_tool_calls:
         chat = client.chat.completions.create(
-            # model="anthropic/claude-haiku-4.5",
             model=AI_MODEL,
             messages=messages,
             tools=[
